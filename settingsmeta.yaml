@@ -1,22 +1,15 @@
 
 skillMetadata:
   sections:
-    - name: Options << Name of section
-      fields:
-        - name: internal_python_variable_name
-          type: text
-          label: Setting Friendly Display Name
-          value: ""
-          placeholder: demo prompt in the input box
-    - name: Login << Name of another section
+    - name: Credentials
       fields:
         - type: label
-          label: Just a little bit of extra info for the user to understand following settings
-        - name: username
+          label: You can specify the access settings of your Bring! account here (comfortable) or locally in the skill directory via credentials.py (secure)
+        - name: login
           type: text
-          label: Username
+          label: Your login/email
           value: ""
         - name: password
           type: password
-          label: Password
+          label: Your password
           value: ""
