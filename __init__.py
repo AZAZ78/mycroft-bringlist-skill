@@ -39,12 +39,12 @@ class BringlistSkill(MycroftSkill):
             else:
                 self.log.info("API connect succeeded")
 
-    @intent_handler(IntentBuilder('AddItemToBringlist').require('bring.add'))
+    @intent_handler(IntentBuilder('AddItemToBringlist').require('bring.add').require('bring.list').require('bring.add.reg'))
     def handle_bringlist_add(self, message):
         item = message.data.get('Item')
         self.speak_dialog('bring.error.add', data={"Item": item})
 
-    @intent_handler(IntentBuilder('RemoveItemFromBringlist').require('bring.remove'))
+    @intent_handler(IntentBuilder('RemoveItemFromBringlist').require('bring.remove').require('bring.list').require('bring.remove.reg'))
     def handle_bringlist_add(self, message):
         item = message.data.get('Item')
         self.speak_dialog('bring.error.remove', data={"Item": item})
