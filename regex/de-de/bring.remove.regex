@@ -1,0 +1,1 @@
+.*(entferne|lösche) ((?P<Desc>.*) )?(?P<Item>\S*) von .*

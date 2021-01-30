@@ -1,18 +1,20 @@
-import pickle
-import base64
+from adapt.intent import IntentBuilder
+from mycroft import MycroftSkill, intent_handler
 
 from os import listdir, path  # makedirs, remove,
 from os.path import dirname, join  # exists, expanduser, isfile, abspath, isdir
 
 from BringApi.BringApi import BringApi
 
-from adapt.intent import IntentBuilder
-from mycroft import MycroftSkill, intent_handler
+import pickle
+import base64
+import re
 
 __author__ = 'azaz78'
 
 class BringlistSkill(MycroftSkill):
     def __init__(self):
+        MycroftSkill.__init__(self)
         super().__init__(name="BringlistSkill")
         self._bring = None
 
@@ -20,38 +22,50 @@ class BringlistSkill(MycroftSkill):
         # handle credentials
         credentials = self._load_credentials_store()
         if credentials:
-            self.uuid = credentials['uuid']
-            self.uuidlist = credentials['list']
+            uuid = credentials['uuid']
+            uuidlist = credentials['list']
         else:
-            self.login = self.settings.get("login", "")
-            self.password = self.settings.get("password", "")
-            self.uuid, self.uuidlist = BringApi.login(email, password)
+            login = self.settings.get("login", "")
+            password = self.settings.get("password", "")
+            uuid, uuidlist = BringApi.login(login, password)
 
-        if self.uuid == None:
+        if uuid == None:
             self.speak_dialog('bring.error.connect')
             self.log.warning("Loading credentials failed, please check your credentials")
         else:
             self.log.info("Loaded credentials")
-            self._bring = BringApi(self.uuid, self.uuidlist)
+            self._bring = BringApi(uuid, uuidlist)
             if self._bring is None:
                 self.speak_dialog('bring.error.connect')
                 self.log.warning("API connect failed")
             else:
                 self.log.info("API connect succeeded")
 
-    @intent_handler(IntentBuilder('AddItemToBringlist').require('bring.add').require('bring.list').require('bring.add.reg'))
+    @intent_handler(IntentBuilder("AddToBringlist")
+                                      .require("bring.list")
+                                      .require("bring.add"))
     def handle_bringlist_add(self, message):
-        item = message.data.get('Item')
-        self.speak_dialog('bring.error.add', data={"Item": item})
+        self.log.info("Bringlist add")
 
-    @intent_handler(IntentBuilder('RemoveItemFromBringlist').require('bring.remove').require('bring.list').require('bring.remove.reg'))
-    def handle_bringlist_add(self, message):
-        item = message.data.get('Item')
-        self.speak_dialog('bring.error.remove', data={"Item": item})
+        item, desc = self._get_item(message.data.get('utterance'), 'bring.add.regex')
+        if item:
+            self._bring.purchase_item(item.capitalize(), desc)
+            self.speak_dialog('bring.success.add', data={"Item": item})
+        else:
+            self.speak_dialog('bring.error.add', data={"Item": item})
 
-    @intent_handler(IntentBuilder('ClearBringlist').require('bring.clear'))
-    def handle_bringlist_add(self, message):
-        self.speak_dialog('bring.error.clear')
+    @intent_handler(IntentBuilder("RemoveFromBringlist")
+                                      .require("bring.list")
+                                      .require("bring.remove"))
+    def handle_bringlist_remove(self, message):
+        self.log.info("Bringlist remove")
+
+        item, desc = self._get_item(message.data.get('utterance'), 'bring.remove.regex')
+        if item:
+            self._bring.remove_item(item.capitalize())
+            self.speak_dialog('bring.success.remove', data={"Item": item})
+        else:
+            self.speak_dialog('bring.error.remove', data={"Item": item})
 
     def _load_credentials_store(self):
         credentials = {}
@@ -63,6 +77,15 @@ class BringlistSkill(MycroftSkill):
                 with open(skill_dir + '/' + credentials_file, 'rb') as f:
                     credentials = pickle.load(f)
         return credentials
+
+    def _get_item(self, text, regfile):
+        with open(self.find_resource(regfile,'regex')) as f:
+           matcher = f.readline().rstrip('\n')
+           match = re.match(matcher, text)
+           if match:
+              return match.group('Item'), match.group('Desc') if match.group('Desc') is not None else "" 
+           else:
+              return None, None
 
 def create_skill():
     return BringlistSkill()
