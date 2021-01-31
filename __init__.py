@@ -46,6 +46,8 @@ class BringlistSkill(MycroftSkill):
                                       .require("bring.add"))
     def handle_bringlist_add(self, message):
         self.log.info("Bringlist add")
+        if self._bring is None:
+            self.speak_dialog('bring.error.connect')
 
         item, desc = self._get_item(message.data.get('utterance'), 'bring.add.regex')
         if item:
@@ -59,6 +61,8 @@ class BringlistSkill(MycroftSkill):
                                       .require("bring.remove"))
     def handle_bringlist_remove(self, message):
         self.log.info("Bringlist remove")
+        if self._bring is None:
+            self.speak_dialog('bring.error.connect')
 
         item, desc = self._get_item(message.data.get('utterance'), 'bring.remove.regex')
         if item:
@@ -72,11 +76,13 @@ class BringlistSkill(MycroftSkill):
                                       .require("bring.clear"))
     def handle_bringlist_clear(self, message):
         self.log.info("Bringlist clear")
+        if self._bring is None:
+            self.speak_dialog('bring.error.connect')
 
-        items = self.bring().get_items()['purchase']
+        items = self._bring.get_items()['purchase']
         if items:
             for item in items:
-                self.bring().recent_item(item['name'])
+                self._bring.recent_item(item['name'])
             self.speak_dialog('bring.success.clear', data={"Count": len(items)})
             return
         self.speak_dialog('bring.error.clear')
