@@ -15,7 +15,6 @@ __author__ = 'azaz78'
 class BringlistSkill(MycroftSkill):
     def __init__(self):
         MycroftSkill.__init__(self)
-        super().__init__(name="BringlistSkill")
         self._bring = None
 
     def initialize(self):
@@ -29,17 +28,18 @@ class BringlistSkill(MycroftSkill):
             password = self.settings.get("password", "")
             uuid, uuidlist = BringApi.login(login, password)
 
-        if uuid == None:
+        if uuid is None:
             self.speak_dialog('bring.error.connect')
             self.log.warning("Loading credentials failed, please check your credentials")
         else:
             self.log.info("Loaded credentials")
             self._bring = BringApi(uuid, uuidlist)
-            if self._bring is None:
-                self.speak_dialog('bring.error.connect')
-                self.log.warning("API connect failed")
-            else:
+            if self._bring is not None:
                 self.log.info("API connect succeeded")
+                return
+                
+        self.speak_dialog('bring.error.connect')
+        self.log.warning("API connect failed")
 
     @intent_handler(IntentBuilder("AddToBringlist")
                                       .require("bring.list")
@@ -51,8 +51,8 @@ class BringlistSkill(MycroftSkill):
         if item:
             self._bring.purchase_item(item.capitalize(), desc)
             self.speak_dialog('bring.success.add', data={"Item": item})
-        else:
-            self.speak_dialog('bring.error.add', data={"Item": item})
+            return
+        self.speak_dialog('bring.error.add', data={"Item": item})
 
     @intent_handler(IntentBuilder("RemoveFromBringlist")
                                       .require("bring.list")
@@ -62,10 +62,24 @@ class BringlistSkill(MycroftSkill):
 
         item, desc = self._get_item(message.data.get('utterance'), 'bring.remove.regex')
         if item:
-            self._bring.remove_item(item.capitalize())
+            self._bring.recent_item(item.capitalize())
             self.speak_dialog('bring.success.remove', data={"Item": item})
-        else:
-            self.speak_dialog('bring.error.remove', data={"Item": item})
+            return
+        self.speak_dialog('bring.error.remove', data={"Item": item})
+
+    @intent_handler(IntentBuilder("ClearBringlist")
+                                      .require("bring.list")
+                                      .require("bring.clear"))
+    def handle_bringlist_clear(self, message):
+        self.log.info("Bringlist clear")
+
+        items = self.bring().get_items()['purchase']
+        if items:
+            for item in items:
+                self.bring().recent_item(item['name'])
+            self.speak_dialog('bring.success.clear', data={"Count": len(items)})
+            return
+        self.speak_dialog('bring.error.clear')
 
     def _load_credentials_store(self):
         credentials = {}
@@ -83,7 +97,7 @@ class BringlistSkill(MycroftSkill):
            matcher = f.readline().rstrip('\n')
            match = re.match(matcher, text)
            if match:
-              return match.group('Item'), match.group('Desc') if match.group('Desc') is not None else "" 
+              return match.group('Item'), match.group('Desc') if match.group('Desc') is not None else ""
            else:
               return None, None
 
