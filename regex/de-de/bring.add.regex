@@ -1,1 +1,1 @@
-.*(ergänze|setze) ((?P<Desc>.*) )?(?P<Item>\S*) auf .*
+.*(ergänze|setze|füge) ((?P<Desc>.*) )?(?P<Item>\S*) auf .*

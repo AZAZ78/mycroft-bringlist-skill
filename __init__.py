@@ -16,6 +16,7 @@ class BringlistSkill(MycroftSkill):
     def __init__(self):
         MycroftSkill.__init__(self)
         self._bring = None
+        self._regex = {}
 
     def initialize(self):
         # handle credentials
@@ -99,13 +100,21 @@ class BringlistSkill(MycroftSkill):
         return credentials
 
     def _get_item(self, text, regfile):
+        match = _get_regex(regfile).match(text)
+        if match:
+            return match.group('Item'), match.group('Desc') if match.group('Desc') is not None else ""
+        else:
+            return None, None
+
+    def _get_regex(self, regfile):
+        regex = self._regex[regfile]
+        if regex is not None:
+            return regex
         with open(self.find_resource(regfile,'regex')) as f:
-           matcher = f.readline().rstrip('\n')
-           match = re.match(matcher, text)
-           if match:
-              return match.group('Item'), match.group('Desc') if match.group('Desc') is not None else ""
-           else:
-              return None, None
+            matcher = f.readline().rstrip('\n')
+            regex = re.compile(matcher)
+            self._regex[regfile] = regex
+            return regex
 
 def create_skill():
     return BringlistSkill()
