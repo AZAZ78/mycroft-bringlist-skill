@@ -100,7 +100,7 @@ class BringlistSkill(MycroftSkill):
         return credentials
 
     def _get_item(self, text, regfile):
-        match = _get_regex(regfile).match(text)
+        match = self._get_regex(regfile).match(text)
         if match:
             return match.group('Item'), match.group('Desc') if match.group('Desc') is not None else ""
         else:
