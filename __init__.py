@@ -107,9 +107,8 @@ class BringlistSkill(MycroftSkill):
             return None, None
 
     def _get_regex(self, regfile):
-        regex = self._regex[regfile]
-        if regex is not None:
-            return regex
+        if regfile in self._regex:
+            return self._regex[regfile]
         with open(self.find_resource(regfile,'regex')) as f:
             matcher = f.readline().rstrip('\n')
             regex = re.compile(matcher)
