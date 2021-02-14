@@ -1,0 +1,1 @@
+.*(add|append) ((?P<Desc>.*) )?(?P<Item>\S*) to .*
