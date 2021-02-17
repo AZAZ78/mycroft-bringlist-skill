@@ -2,7 +2,9 @@
 
 import base64
 import pickle
+from os.path import join
 from BringApi.BringApi import BringApi
+from mycroft.filesystem import FileSystemAccess
 
 try:
     input = raw_input
@@ -18,5 +20,9 @@ if uuid is None:
 
 credentials = {'uuid': uuid, 'list': uuidlist}
 
-with open('/opt/mycroft/skills/mycroft-bringlist-skill.azaz78/credentials.store', 'wb') as f:
+file_system = FileSystemAccess(join('skills', 'BringlistSkill'))
+
+with file_system.open('credentials.store', 'wb') as f:
     pickle.dump(credentials, f, pickle.HIGHEST_PROTOCOL)
+
+print('Created credentials.store in {}'.format(file_system.path))

@@ -21,7 +21,7 @@ class BringlistSkill(MycroftSkill):
     def initialize(self):
         # handle credentials
         credentials = self._load_credentials_store()
-        if credentials:
+        if credentials is not None:
             uuid = credentials['uuid']
             uuidlist = credentials['list']
         else:
@@ -89,14 +89,11 @@ class BringlistSkill(MycroftSkill):
         self.speak_dialog('bring.error.clear')
 
     def _load_credentials_store(self):
-        credentials = {}
-        skill_dir = dirname(__file__)
+        credentials = None 
         credentials_file = 'credentials.store'
-        if path.exists(skill_dir):
-            file_list = listdir(skill_dir)
-            if credentials_file in file_list:
-                with open(skill_dir + '/' + credentials_file, 'rb') as f:
-                    credentials = pickle.load(f)
+        if self.file_system.exists(credentials_file):
+            with self.file_system.open(credentials_file, 'rb') as f:
+                credentials = pickle.load(f)
         return credentials
 
     def _get_item(self, text, regfile):
