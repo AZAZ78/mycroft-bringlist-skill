@@ -51,7 +51,7 @@ class BringlistSkill(MycroftSkill):
             self.speak_dialog('bring.error.connect')
 
         item, desc = self._get_item(message.data.get('utterance'), 'bring.add.regex')
-        if item:
+        if item is not None:
             self._bring.purchase_item(item.capitalize(), desc)
             self.speak_dialog('bring.success.add', data={"Item": item})
             return
