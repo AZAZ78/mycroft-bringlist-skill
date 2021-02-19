@@ -20,6 +20,8 @@ class BringlistSkill(MycroftSkill):
 
     def initialize(self):
         # handle credentials
+        uuid = None
+        uuidlist = None
         credentials = self._load_credentials_store()
         if credentials is not None:
             uuid = credentials['uuid']
@@ -27,7 +29,8 @@ class BringlistSkill(MycroftSkill):
         else:
             login = self.settings.get("login", "")
             password = self.settings.get("password", "")
-            uuid, uuidlist = BringApi.login(login, password)
+            if login:
+                uuid, uuidlist = BringApi.login(login, password)
 
         if uuid is None:
             self.speak_dialog('bring.error.connect')
