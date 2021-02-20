@@ -19,6 +19,13 @@ class BringlistSkill(MycroftSkill):
         self._regex = {}
 
     def initialize(self):
+        self.settings_change_callback = self.on_websettings_changed
+        self.setup()
+
+    def on_websettings_changed(self):
+        self.setup()
+
+    def setup(self):
         # handle credentials
         uuid = None
         uuidlist = None
@@ -35,15 +42,16 @@ class BringlistSkill(MycroftSkill):
         if uuid is None:
             self.speak_dialog('bring.error.connect')
             self.log.warning("Loading credentials failed, please check your credentials")
-        else:
-            self.log.info("Loaded credentials")
-            self._bring = BringApi(uuid, uuidlist)
-            if self._bring is not None:
-                self.log.info("API connect succeeded")
-                return
-                
-        self.speak_dialog('bring.error.connect')
-        self.log.warning("API connect failed")
+            return
+            
+        self.log.info("Loaded credentials")
+        self._bring = BringApi(uuid, uuidlist)
+        if self._bring is None:
+            self.speak_dialog('bring.error.connect')
+            self.log.warning("API connect failed")
+        
+        self.log.info("API connect succeeded")
+        return
 
     @intent_handler(IntentBuilder("AddToBringlist")
                                       .require("bring.list")
