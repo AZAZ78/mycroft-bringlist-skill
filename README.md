@@ -7,7 +7,7 @@ It lets you add and remove items from your default shopping list and also clear 
 ## Examples
 * "Setze <Item> auf meine Einkaufsliste" | "Add <Item> to my shoppinglist"
 * "Entferne bitte <Item> aus meinen Einkaufswagen" | "Remove <Item> from my shopping cart"
-* "Entferne <Item> von meiner Liste" | "Remove <Item> from my list"
+* "Entferne alle Elemente von meiner Bring Liste" | "Remove all items from my bring list"
 ## Credits
 Alexander Zeh (azaz78)
 
