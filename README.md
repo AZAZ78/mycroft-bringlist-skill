@@ -1,12 +1,13 @@
 # <img src="https://raw.githack.com/FortAwesome/Font-Awesome/master/svgs/solid/shopping-cart.svg" card_color="#22A7F0" width="50" height="50" style="vertical-align:bottom"/> Bringlist
-This skill enables interaction with the famous bring! app
+This skill enables interaction with the famous bring! app (https://www.getbring.com/)
 
 ## About
-Tbd
+It lets you add and remove items from your default shopping list and also clear all items.
 
 ## Examples
-* "Setze xxx auf deie lsite"
-
+* "Setze <Item> auf meine Einkaufsliste" | "Add <Item> to my shoppinglist"
+* "Entferne bitte <Item> aus meinen Einkaufswagen" | "Remove <Item> from my shopping cart"
+* "Entferne <Item> von meiner Liste" | "Remove <Item> from my list"
 ## Credits
 Alexander Zeh (azaz78)
 
@@ -16,4 +17,5 @@ Alexander Zeh (azaz78)
 ## Tags
 #Bring
 #Shopping
+#List
 

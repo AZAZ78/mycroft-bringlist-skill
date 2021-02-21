@@ -1,3 +1,8 @@
+#
+# Bringlist skill for Mycroft
+#   - Adds, Deletes or clears items to/from your default Bring!-list (https://www.getbring.com/)
+#
+
 from adapt.intent import IntentBuilder
 from mycroft import MycroftSkill, intent_handler
 
